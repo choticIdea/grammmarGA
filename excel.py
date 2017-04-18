@@ -16,5 +16,6 @@ while len(order) != 0 :
        stack.append(res)
        order.pop();
 
-print(stack.pop())
+print(stack.pop());
+a = re
 

@@ -20,7 +20,14 @@ varRules = [prev,open,high,low,close];
 literals = [plus,minus,times,division,prev,open,high,low,close];
 stack = [expr];
 formula = []
-
+def isOperator(token):
+    if(token == plus or
+       token == minus or
+       token == times or
+       token == division):
+        return  True;
+    else:
+        return False;
 def isLiteral(token):
    for lit in literals:
        if(token == lit):
@@ -35,18 +42,9 @@ def operatorRule(prodRule):
 def variableRule(prodRule):
   stack.append(varRules[prodRule]);
 
-def bintodec(kromosom):
-    dec = [];
-    idx = 0;
-    num = 0;
-    for c in kromosom:
-            if(idx > 0 and idx % 5 == 0):
-                dec.append(num);
-                num = 0;
-            num+= 2^(idx % 5) * c;
-            idx += 1;
-
-    return dec
+#need state machine to verify the translation;
+def placebo():
+    return [plus,close,low];
 def translate(kromosom):
  for c in kromosom:
 
