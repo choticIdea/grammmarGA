@@ -92,9 +92,12 @@ def compute(f, rowData):
     ret = 0;
     stack = [];
     while len(f) != 0:
+        print(f[0]);
+        print(Translator.isOperator([f[0]]))
         if (Translator.isOperator(f[len(f) - 1]) == False):
             idx = convert(f.pop())
             stack.append(rowData[idx])
+
 
         else:
 
@@ -109,6 +112,7 @@ def compute(f, rowData):
                 res = stack.pop() / stack.pop();
             print(res);
             stack.append(res);
+
     return stack.pop() - rowData[avg]
 
 
@@ -134,12 +138,17 @@ avg = 10;
 #
 
 pops = random_populasi(1, bitsperCode * cromosomCode);
-formula = Translator.placebo();
-
+#formula = Translator.translate(pops[0].prodCode);
+formula = [];
+formula.append(Translator.low);
+f = copy.copy(formula)
+v = Translator.verify(f);
 totalSE = 0;
 t = 0;
 for row in data:
-    f = copy.copy(formula);
+    if(v == False):
+        break;
+    f = copy.copy(formula)
     t = compute(f, row);
     t = t * t;
     totalSE += t;

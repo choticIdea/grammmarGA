@@ -45,6 +45,24 @@ def variableRule(prodRule):
 #need state machine to verify the translation;
 def placebo():
     return [plus,close,low];
+def verify(prodCode):
+    broken = False;
+    stack = [];
+    while(len(prodCode) != 0 and broken == False):
+        if (isOperator(prodCode[len(prodCode) - 1]) == False and isLiteral(prodCode[len(prodCode) - 1]) == True):
+            stack.append(var);
+            prodCode.pop();
+        elif(isOperator(prodCode[len(prodCode) - 1]) == True):
+           prodCode.pop();
+           if(len(stack) <= 1):
+                broken = True
+           else :
+               stack.pop();
+
+    if(broken) :
+         return False # it is broken;
+    elif(len(prodCode) == 0 and broken == False):
+         return True # it is usable;
 def translate(kromosom):
  for c in kromosom:
 
