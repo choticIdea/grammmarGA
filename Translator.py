@@ -48,7 +48,10 @@ def placebo():
 def verify(prodCode):
     broken = False;
     stack = [];
+    if(len(prodCode) == 0):
+        return False;
     while(len(prodCode) != 0 and broken == False):
+
         if (isOperator(prodCode[len(prodCode) - 1]) == False and isLiteral(prodCode[len(prodCode) - 1]) == True):
             stack.append(var);
             prodCode.pop();
@@ -66,13 +69,11 @@ def verify(prodCode):
 def translate(kromosom):
  for c in kromosom:
 
-    print(stack)
+    if (len(stack) == 0):
+         break;
     top = stack[len(stack)-1];
     if(isLiteral(top)):
         formula.append(stack.pop());
-    if(len(stack) == 0):
-        break;
-    top = stack[len(stack) - 1];
     if(top == expr ):
         stack.pop()
         expressionRule(c % len(exprRules))

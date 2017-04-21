@@ -59,7 +59,7 @@ def cross_over(indv1, indv2):
     titik_potong = r.randint(0, len(indv2.kromosom))
     anak1 = indv1.kromosom[:titik_potong] + indv2.kromosom[titik_potong:]
     anak2 = indv2.kromosom[:titik_potong] + indv1.kromosom[titik_potong:]
-    return Individu(anak1), Individu(anak2)
+    return [Individu(anak1,bitsperCode), Individu(anak2,bitsperCode)]
 
 
 def mutasi(individu, permutation_rate):
@@ -86,15 +86,23 @@ def convert(translateCode):
         return low;
     elif (translateCode == Translator.high):
         return high;
+    elif (translateCode == Translator.open):
+        return open;
+def createZeros(size):
+    z = [];
+    for i in range(0,size):
+        z.append(0);
+    return z;
 
 
 def compute(f, rowData):
     ret = 0;
     stack = [];
     while len(f) != 0:
-        print(f[0]);
-        print(Translator.isOperator([f[0]]))
+
+
         if (Translator.isOperator(f[len(f) - 1]) == False):
+            print(f[len(f)-1])
             idx = convert(f.pop())
             stack.append(rowData[idx])
 
@@ -110,7 +118,7 @@ def compute(f, rowData):
                 res = stack.pop() * stack.pop();
             elif (opr == Translator.division):
                 res = stack.pop() / stack.pop();
-            print(res);
+
             stack.append(res);
 
     return stack.pop() - rowData[avg]
@@ -136,24 +144,72 @@ low = 3
 close = 4
 avg = 10;
 #
-
-pops = random_populasi(1, bitsperCode * cromosomCode);
+epoch = 0;
+maxEpoch = 40;
+startingPops =30;
+pops = random_populasi(startingPops, bitsperCode * cromosomCode);
+msePops =[];
 #formula = Translator.translate(pops[0].prodCode);
-formula = [];
-formula.append(Translator.low);
-f = copy.copy(formula)
-v = Translator.verify(f);
 totalSE = 0;
-t = 0;
-for row in data:
-    if(v == False):
-        break;
-    f = copy.copy(formula)
-    t = compute(f, row);
-    t = t * t;
-    totalSE += t;
-mse = totalSE / len(data);
-print(mse);
+while epoch < maxEpoch:
+    #generate new pops/child
+    clone = copy.copy(pops);
+    while(len(clone) != 0):
+        children = cross_over(clone.pop(),clone.pop());
+        pops = pops+children;
 
 
-# replacing pops with better one
+    #evaluate
+    for individu in pops:
+        formula = [];
+        formula = (Translator.translate(individu.prodCode));
+
+        f = copy.copy(formula)
+
+        v = Translator.verify(f);
+
+
+        if(v == False):
+            continue;
+
+        else:
+
+            for row in data:
+                if (v == False):
+                    break;
+                f = copy.copy(formula)
+                print(f);
+                t = compute(f, row);
+                t = t * t;
+                totalSE += t;
+            mse = totalSE / len(data);
+        msePops.append(mse);
+        mse = 0;
+        totalSE = 0;
+    #sorting
+    bestMSE = -1;
+    idx = 0;
+    t = [];
+    print(len(msePops));
+    print(len(pops));
+    for i in range(len(pops)):
+        for k in range(i, len(pops)):
+            if (bestMSE == -1 or bestMSE > msePops[k]):
+                bestMSE = msePops[k];
+                idx = k;
+
+        t = pops[i];
+        pops[i] = pops[idx];
+        pops[idx] = t;
+        t = msePops[i];
+        msePops[i] = msePops[idx];
+        msePops[idx] = t;
+
+        idx = -1;
+        bestMSE = -1;
+    #culling weak individuals
+    pops = pops[:startingPops];
+    msePops = msePops[:startingPops];
+    epoch+= 1;
+
+
