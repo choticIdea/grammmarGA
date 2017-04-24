@@ -6,20 +6,20 @@ plus = "+";
 minus = "-";
 times = "x";
 division =":";
-prev = "prev";
-open = "open";
-high = "high";
-low = "low";
-close = "close";
+first = "first";
+second = "second";
+third = "third";
+fourth = "fourth";
+fifth = "fifth";
 
 
 
 exprRules = [[var],[operator,expr,expr],[operator,expr,operator,expr]];
 operatorRules = [plus,minus,times,division];
-varRules = [prev,open,high,low,close];
-literals = [plus,minus,times,division,prev,open,high,low,close];
+varRules = [first, second, third, fourth, fifth];
+literals = [plus, minus, times, division, first, second, third, fourth, fifth];
 stack = [expr];
-formula = []
+
 def isOperator(token):
     if(token == plus or
        token == minus or
@@ -44,7 +44,7 @@ def variableRule(prodRule):
 
 #need state machine to verify the translation;
 def placebo():
-    return [plus,close,low];
+    return [plus, fifth, fourth];
 def verify(prodCode):
     broken = False;
     stack = [];
@@ -67,6 +67,7 @@ def verify(prodCode):
     elif(len(prodCode) == 0 and broken == False):
          return True # it is usable;
 def translate(kromosom):
+ formula = []
  for c in kromosom:
 
     if (len(stack) == 0):

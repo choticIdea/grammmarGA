@@ -61,7 +61,11 @@ def cross_over(indv1, indv2):
     anak2 = indv2.kromosom[:titik_potong] + indv1.kromosom[titik_potong:]
     return [Individu(anak1,bitsperCode), Individu(anak2,bitsperCode)]
 
-
+def getData(start,end):
+    ret = [];
+    for i in range(start,end):
+        ret.append(data[i][avg]);
+    return ret;
 def mutasi(individu, permutation_rate):
     # melakukan mutasi dengan membalik nilai bit pada kromosom individu
     mutan = []
@@ -78,15 +82,15 @@ def mutasi(individu, permutation_rate):
 
 
 def convert(translateCode):
-    if (translateCode == Translator.prev):
+    if (translateCode == Translator.first):
         return prev;
-    elif (translateCode == Translator.close):
+    elif (translateCode == Translator.fifth):
         return close;
-    elif (translateCode == Translator.low):
+    elif (translateCode == Translator.fourth):
         return low;
-    elif (translateCode == Translator.high):
+    elif (translateCode == Translator.third):
         return high;
-    elif (translateCode == Translator.open):
+    elif (translateCode == Translator.second):
         return open;
 def createZeros(size):
     z = [];
@@ -102,8 +106,9 @@ def compute(f, rowData):
 
 
         if (Translator.isOperator(f[len(f) - 1]) == False):
-            print(f[len(f)-1])
+
             idx = convert(f.pop())
+
             stack.append(rowData[idx])
 
 
@@ -117,11 +122,16 @@ def compute(f, rowData):
             elif (opr == Translator.times):
                 res = stack.pop() * stack.pop();
             elif (opr == Translator.division):
-                res = stack.pop() / stack.pop();
+                x1 = stack.pop();
+                x2 = stack.pop();
+                if(x2 != 0):
+                    res = x1 / x2;
+                else :
+                    return x1;# -1 is infinite symbol, hence the Error is automatically set big;
 
             stack.append(res);
 
-    return stack.pop() - rowData[avg]
+    return stack.pop();
 
 
 # loading data;
@@ -148,7 +158,7 @@ epoch = 0;
 maxEpoch = 40;
 startingPops =30;
 pops = random_populasi(startingPops, bitsperCode * cromosomCode);
-msePops =[];
+
 #formula = Translator.translate(pops[0].prodCode);
 totalSE = 0;
 while epoch < maxEpoch:
@@ -158,40 +168,51 @@ while epoch < maxEpoch:
         children = cross_over(clone.pop(),clone.pop());
         pops = pops+children;
 
-
+    msePops = [];
     #evaluate
     for individu in pops:
         formula = [];
-        formula = (Translator.translate(individu.prodCode));
+
+        formula = Translator.translate(individu.prodCode);
 
         f = copy.copy(formula)
-
+        print(f);
         v = Translator.verify(f);
 
 
         if(v == False):
+            msePops.append(100000);
             continue;
 
-        else:
 
-            for row in data:
+        else:
+            last = 5;
+            first = 0;
+            while (last < len(data) - 1):
+                row = getData(first, last);
+
+
+
                 if (v == False):
                     break;
                 f = copy.copy(formula)
-                print(f);
+
                 t = compute(f, row);
+                t = abs(t-data[last][avg]);
                 t = t * t;
                 totalSE += t;
+                first += 1;
+                last += 1
             mse = totalSE / len(data);
         msePops.append(mse);
         mse = 0;
         totalSE = 0;
+
+
     #sorting
     bestMSE = -1;
     idx = 0;
     t = [];
-    print(len(msePops));
-    print(len(pops));
     for i in range(len(pops)):
         for k in range(i, len(pops)):
             if (bestMSE == -1 or bestMSE > msePops[k]):
@@ -207,9 +228,12 @@ while epoch < maxEpoch:
 
         idx = -1;
         bestMSE = -1;
+    print(msePops)
     #culling weak individuals
     pops = pops[:startingPops];
     msePops = msePops[:startingPops];
+    print(msePops)
     epoch+= 1;
+
 
 
