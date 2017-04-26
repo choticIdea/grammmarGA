@@ -59,7 +59,16 @@ def cross_over(indv1, indv2):
     titik_potong = r.randint(0, len(indv2.kromosom))
     anak1 = indv1.kromosom[:titik_potong] + indv2.kromosom[titik_potong:]
     anak2 = indv2.kromosom[:titik_potong] + indv1.kromosom[titik_potong:]
-    return [Individu(anak1,bitsperCode), Individu(anak2,bitsperCode)]
+    a = Individu(anak1,bitsperCode);
+    b = Individu(anak2,bitsperCode)
+    child = [];
+    child.append(a);
+    child.append(b);
+    rnd = r.randint(1,100);
+    if(rnd > mutationRate):
+       child.append(mutasi(a,mutationRate));
+       child.append(mutasi(b,mutationRate));
+    return child
 
 def getData(start,end):
     ret = [];
@@ -70,15 +79,15 @@ def mutasi(individu, permutation_rate):
     # melakukan mutasi dengan membalik nilai bit pada kromosom individu
     mutan = []
     for gen in individu.kromosom:
-        p = r.uniform(0, 1)
-        if p <= permutation_rate:
+        p = r.uniform(0, 1) * 100;
+        if p > permutation_rate:
             if gen == 0:
                 mutan.append(1)
             else:
                 mutan.append(0)
         else:
             mutan.append(gen)
-    return Individu(mutan)
+    return Individu(mutan,bitsperCode)
 
 
 def convert(translateCode):
@@ -108,7 +117,6 @@ def compute(f, rowData):
         if (Translator.isOperator(f[len(f) - 1]) == False):
 
             idx = convert(f.pop())
-
             stack.append(rowData[idx])
 
 
@@ -153,10 +161,11 @@ high = 2
 low = 3
 close = 4
 avg = 10;
+mutationRate = 40;#ranging from 1-100 , this number is chance to mutate in percentage
 #
 epoch = 0;
-maxEpoch = 40;
-startingPops =30;
+maxEpoch = 150;
+startingPops =40;
 pops = random_populasi(startingPops, bitsperCode * cromosomCode);
 
 #formula = Translator.translate(pops[0].prodCode);
@@ -164,6 +173,7 @@ totalSE = 0;
 while epoch < maxEpoch:
     #generate new pops/child
     clone = copy.copy(pops);
+
     while(len(clone) != 0):
         children = cross_over(clone.pop(),clone.pop());
         pops = pops+children;
@@ -209,6 +219,7 @@ while epoch < maxEpoch:
         totalSE = 0;
 
 
+
     #sorting
     bestMSE = -1;
     idx = 0;
@@ -234,6 +245,6 @@ while epoch < maxEpoch:
     msePops = msePops[:startingPops];
     print(msePops)
     epoch+= 1;
-
+print(Translator.translate(pops[0].prodCode));
 
 

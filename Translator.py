@@ -61,6 +61,7 @@ def verify(prodCode):
                 broken = True
            else :
                stack.pop();
+               stack.pop();
 
     if(broken) :
          return False # it is broken;
